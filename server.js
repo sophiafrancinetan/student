@@ -112,9 +112,17 @@ app.get('/api/v1/students', async (req, res) => {
  *   get:
  *    summary: Get all students within the course
  *    tags: [Students]
+ *    parameters:
+ *      - in: path
+ *        name: course
+ *        schema:
+ *          type: string
+ *        required: true
+ *        description: Course code (example BSIT)
  *    responses: 
  *      200:
  *        description: List of all the students within the course
+ *                
  */
 app.get('/api/v1/students/course/:course', async (req, res) => {
   try {
@@ -132,6 +140,12 @@ app.get('/api/v1/students/course/:course', async (req, res) => {
  *   get:
  *    summary: Get all students within the section
  *    tags: [Students]
+ *    parameters:
+ *      - in: path
+ *        name: section
+ *        schema:
+ *          type: string
+ *        required: true
  *    responses: 
  *      200:
  *        description: List of all the students within the section
@@ -152,6 +166,12 @@ app.get('/api/v1/students/section/:section', async (req, res) => {
  *   get:
  *    summary: Get all students within the year level
  *    tags: [Students]
+ *    parameters:
+ *      - in: path
+ *        name: year
+ *        schema:
+ *          type: string
+ *        required: true
  *    responses: 
  *      200:
  *        description: List of all the students within the year level
@@ -301,10 +321,16 @@ app.put('/api/v1/students/:id', async (req, res) => {
  *        in: path
  *        required: true
  *        schema:
- *          type: object
+ *          type: string
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            $ref: '#/components/schemas/Student'
  *    responses:
  *      200:
- *        description: Student updated
+ *        description: Student patched
  *      404:
  *        description: Student not found
  */

@@ -9,8 +9,8 @@ const swaggerDefinition = {
   },
   servers: [
     {
-      url: 'https://studentinformationapi.onrender.com/api-docs/#/',
-      description: 'Swagger Server',
+      url: 'http://localhost:3000',
+      description: 'Local Server',
     },
   ],
   components: {

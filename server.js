@@ -3,17 +3,24 @@
 // Node.js + Express + MongoDB Atlas
 // ==============================
 
+
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./config/swagger');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
+
 
 // ====== Middleware ======
 app.use(cors());
 app.use(express.json());
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
 
 // ====== Mongoose Schema & Model ======
 const studentSchema = new mongoose.Schema({
@@ -27,16 +34,47 @@ const studentSchema = new mongoose.Schema({
   year: Number
 }, { timestamps: true });
 
+
 const Student = mongoose.model('Student', studentSchema);
+
 
 // ====== Routes ======
 
+
 // Root
+/**
+ * @swagger
+ * /:
+ *  get:
+ *    summary: API root endpoint
+ *    responses: 
+ *      200:
+ *        description: Returns API running message
+ */
 app.get('/', (req, res) => {
   res.send('✅ Student CRUD API is running!');
 });
 
+
 // Create a student
+/**
+ * @swagger
+ * /api/v1/students:
+ *  post:
+ *    summary: Add new Student
+ *    tags: [Students]
+ *    requestBody:
+ *      required: true
+ *      content: 
+ *        application/json:
+ *          schema:
+ *            $ref: '#/components/schemas/Student'
+ *    responses: 
+ *      201:
+ *        description: Student added
+ *      400:
+ *        description: Error Required fields are missing
+ */
 app.post('/api/v1/students', async (req, res) => {
   try {
     const student = new Student(req.body);
@@ -47,7 +85,18 @@ app.post('/api/v1/students', async (req, res) => {
   }
 });
 
+
 // Read all students
+/**
+ * @swagger
+ * /api/v1/students:
+ *  get:
+ *    summary: Get all students
+ *    tags: [Students]
+ *    responses: 
+ *      200:
+ *        description: List of all the students
+ */
 app.get('/api/v1/students', async (req, res) => {
   try {
     const students = await Student.find().sort({ createdAt: -1 });
@@ -57,6 +106,16 @@ app.get('/api/v1/students', async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/v1/students/course/{course}:
+ *   get:
+ *    summary: Get all students within the course
+ *    tags: [Students]
+ *    responses: 
+ *      200:
+ *        description: List of all the students within the course
+ */
 app.get('/api/v1/students/course/:course', async (req, res) => {
   try {
     const student = await Student.find({course:req.params.course});
@@ -67,6 +126,16 @@ app.get('/api/v1/students/course/:course', async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/v1/students/section/{section}:
+ *   get:
+ *    summary: Get all students within the section
+ *    tags: [Students]
+ *    responses: 
+ *      200:
+ *        description: List of all the students within the section
+ */
 app.get('/api/v1/students/section/:section', async (req, res) => {
   try {
     const student = await Student.find({section:req.params.section});
@@ -77,6 +146,16 @@ app.get('/api/v1/students/section/:section', async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/v1/students/year/{year}:
+ *   get:
+ *    summary: Get all students within the year level
+ *    tags: [Students]
+ *    responses: 
+ *      200:
+ *        description: List of all the students within the year level
+ */
 app.get('/api/v1/students/year/:year', async (req, res) => {
   try {
     const student = await Student.find({year:req.params.year});
@@ -87,7 +166,26 @@ app.get('/api/v1/students/year/:year', async (req, res) => {
   }
 });
 
+
 // Read one student
+/**
+ * @swagger
+ * /api/v1/students/{id}:
+ *  get:
+ *    summary: Get a student by ID
+ *    tags: [Students]
+ *    parameters:
+ *      - name: id
+ *        in: path
+ *        required: true
+ *        schema:
+ *          type: string
+ *    responses:
+ *      200:
+ *        description: Student found
+ *      404:
+ *        description: Student not found
+ */
 app.get('/api/v1/students/:id', async (req, res) => {
   try {
     const student = await Student.findById(req.params.id);
@@ -98,6 +196,24 @@ app.get('/api/v1/students/:id', async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/v1/students/email/{email}:
+ *  get:
+ *    summary: Get a student by Email
+ *    tags: [Students]
+ *    parameters:
+ *      - name: email
+ *        in: path
+ *        required: true
+ *        schema:
+ *          type: string
+ *    responses:
+ *      200:
+ *        description: Student found
+ *      404:
+ *        description: Student not found
+ */
 app.get('/api/v1/students/email/:email', async (req, res) => {
   try {
     const student = await Student.findOne({email:req.params.email});
@@ -108,6 +224,24 @@ app.get('/api/v1/students/email/:email', async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/v1/students/studentNo/{studentNo}:
+ *  get:
+ *    summary: Get a student by Student Number
+ *    tags: [Students]
+ *    parameters:
+ *      - name: studentNo
+ *        in: path
+ *        required: true
+ *        schema:
+ *          type: string
+ *    responses:
+ *      200:
+ *        description: Student found
+ *      404:
+ *        description: Student not found
+ */
 app.get('/api/v1/students/studentNo/:studentNo', async (req, res) => {
   try {
     const student = await Student.findOne({studentNo:req.params.studentNo});
@@ -118,7 +252,32 @@ app.get('/api/v1/students/studentNo/:studentNo', async (req, res) => {
   }
 });
 
+
 // Update student
+/**
+ * @swagger
+ * /api/v1/students/{id}:
+ *  put:
+ *    summary: Update student (replace all required fields)
+ *    tags: [Students]
+ *    parameters:
+ *      - name: id
+ *        in: path
+ *        required: true
+ *        schema: 
+ *          type: string
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            $ref: '#/components/schemas/Student'
+ *    responses:
+ *      200:
+ *        description: Student updated
+ *      404:
+ *        description: Student not found
+ */
 app.put('/api/v1/students/:id', async (req, res) => {
   try {
     const student = await Student.findByIdAndUpdate(req.params.id, req.body, {new: true});
@@ -129,10 +288,29 @@ app.put('/api/v1/students/:id', async (req, res) => {
   }
 });
 
+
 //Patch
+/**
+ * @swagger
+ * /api/v1/students/{id}:
+ *  patch:
+ *    summary: Partially update a student
+ *    tags: [Students]
+ *    parameters:
+ *      - name: id
+ *        in: path
+ *        required: true
+ *        schema:
+ *          type: object
+ *    responses:
+ *      200:
+ *        description: Student updated
+ *      404:
+ *        description: Student not found
+ */
 app.patch('/api/v1/students/:id', async (req, res)=> {
     try {
-        const student = await Student.findByIdAndUpdate(req.params.id, req.body, {$set: req.body}, {new: true, runValidators: true});
+        const student = await Student.findByIdAndUpdate(req.params.id, {$set: req.body}, {new: true, runValidators: true});
         if (!student) return res.status(404).json({message: 'Student not found'});
         res.json(student);
     } catch (err) {
@@ -140,7 +318,26 @@ app.patch('/api/v1/students/:id', async (req, res)=> {
     }
 });
 
+
 // Delete student
+/**
+ * @swagger
+ * /api/v1/students/{id}:
+ *  delete:
+ *    summary: Delete a student
+ *    tags: [Students]
+ *    parameters:
+ *      - name: id
+ *        in: path
+ *        required: true
+ *        schema:
+ *          type: string
+ *    responses: 
+ *      200:
+ *        description: Student deleted
+ *      404:
+ *        description: Student not found
+ */
 app.delete('/api/v1/students/:id', async (req, res) => {
   try {
     const student = await Student.findByIdAndDelete(req.params.id);
@@ -150,6 +347,7 @@ app.delete('/api/v1/students/:id', async (req, res) => {
     res.status(500).json({message: err.message});
   }
 });
+
 
 // ====== Connect to MongoDB Atlas ======
 async function startServer() {
@@ -162,4 +360,6 @@ async function startServer() {
   }
 }
 
+
 startServer();
+

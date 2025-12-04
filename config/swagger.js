@@ -35,7 +35,7 @@ const swaggerDefinition = {
 
 const options = {
   definition: swaggerDefinition,
-  apis: ['./server.js'], // Swagger will scan server.js for route docs
+  apis: [path.join(__dirname, '../server.js')], // Swagger will scan server.js for route docs
 };
 
 module.exports = swaggerJSDoc(options);

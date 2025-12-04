@@ -1,5 +1,5 @@
 const swaggerJSDoc = require('swagger-jsdoc');
-
+const path = require('path');
 const swaggerDefinition = {
   openapi: '3.0.3',
   info: {
